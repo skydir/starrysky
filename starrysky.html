@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <title>Skydir.</title>
+        <meta name="description" content="Starry sky from skydir. You can see starry sky." />
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no , minimum-scale=1">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <!-- a-frame-->
+        <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+        <!-- a-frame for line -->
+        <script src="https://rawgit.com/andreasplesch/aframe-meshline-component/master/dist/aframe-meshline-component.min.js"></script>
+    </head>
+    <body>
+        <a-scene myScene id="myScene" visible="true" position='0 0 0' >
+            <a-entity class='sozvezdie' visible="true" position='0 0 0'></a-entity>
+            <a-entity class='lines' visible="true" position='0 0 0'></a-entity> 
+            <!-- s3 -->
+            <a-entity class='star' id='superStar'
+                      geometry="primitive: sphere; radius: 10"
+                      material="color: white">
+            </a-entity>
+            <a-entity position='0 0 0'>
+                <a-sky radius="5000" visible="true" material='color: black;' ></a-sky>
+            </a-entity>
+            <!-- s0 -->
+            <a-entity class='star'
+                      geometry="primitive: sphere; radius: 10"
+                      position="0 0 -1000"
+                      material="color: yellow">
+            </a-entity>
+            <!-- s1 -->
+            <a-entity class='star'
+                      geometry="primitive: sphere; radius: 10"
+                      position="500 0 -1000"
+                      material="color: yellow">
+            </a-entity>
+            <!-- s2 -->
+            <a-entity class='star'
+                      geometry="primitive: sphere; radius: 10"
+                      position="0 500 -1000"
+                      material="color: yellow">
+            </a-entity>
+
+
+            <!-- ls0s1  -->
+            <a-entity meshline="lineWidth: 1; path: 0 0 -1000, 500 0 -1000 ; color: orange"></a-entity>
+
+  </a-scene>
+</body>
+        </a-scene>
+        <script>
+            'use strict';
+            window.onload=()=>{
+                const classname = document.getElementsByClassName("star");
+                Array.from(classname).forEach(function(element) {
+                  element.addEventListener('mouseenter', handleStarMouseEnter );
+                  element.addEventListener('mouseleave', handleStarMouseLeave );
+                });
+                
+                let sozvezdie=[
+                    {
+                        'vershini': [
+                            {
+                                'hor': 0,
+                                'ver': 45
+                            },
+                            {
+                                'hor': -30,
+                                'ver': 90
+                            },
+                            {
+                                'hor': -60,
+                                'ver': 60
+                            }
+                        ],
+                        'lines': [
+                            {
+                                'from': 0,
+                                'to': 1
+                            },
+                            {
+                                'from': 1,
+                                'to': 2
+                            }
+                        ]
+                    }
+                ];
+
+                sozvezdie[0].vershini.forEach((el, index)=>{
+                    let newPosition=getCoordinates(el.hor, el.ver);
+                    document.getElementsByClassName('sozvezdie').item(0).innerHTML+=
+                    "<a-entity class='star' id='superStar' position='"+newPosition+"' geometry='primitive: sphere; radius: 10' material='color: white'></a-entity>";
+                });
+                sozvezdie[0].lines.forEach((el, index)=>{
+                    let positionFrom=getCoordinates(sozvezdie[0].vershini[el.from].hor, sozvezdie[0].vershini[el.from].ver);
+                    let positionTo=getCoordinates(sozvezdie[0].vershini[el.to].hor, sozvezdie[0].vershini[el.to].ver);
+                    document.getElementsByClassName('lines').item(0).innerHTML+=
+                    "<a-entity meshline='lineWidth: 1; path: "+positionFrom+", "+positionTo+"; color: orange'></a-entity>";
+                });
+
+            };
+            function handleStarMouseEnter(ev){
+                event.target.setAttribute('material','color', 'green');
+            }
+            function handleStarMouseLeave(ev){
+                event.target.setAttribute('material','color', 'yellow');
+            }
+            function getRadian(grad){
+                return grad/180.0*Math.PI;
+            }
+            function getCoordinates(horDegree, verDegree){
+                let newDecCoordinate={};
+                const radius=1000;
+                newDecCoordinate.x=radius*Math.sin(getRadian(verDegree))*Math.cos(getRadian(horDegree));
+                newDecCoordinate.y=radius*Math.cos(getRadian(verDegree));
+                newDecCoordinate.z=radius*Math.sin(getRadian(verDegree))*Math.sin(getRadian(horDegree));
+                let newStringPosition=newDecCoordinate.x+' '+newDecCoordinate.y+' '+newDecCoordinate.z;
+                return newStringPosition;
+            }
+            function changeElementPosition(el,newStringPosition){
+                el.setAttribute('position',newStringPosition);
+            }
+        </script>
+    </body>
+</html>
